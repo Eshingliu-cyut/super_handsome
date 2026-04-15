@@ -6,30 +6,29 @@
 <title>加分題#2</title>
 
 <style>
+body{
+  margin:0;
+  font-family:Arial,"Microsoft JhengHei";
+  color:white;
+  overflow:hidden;
 
-
-  
-/* ===== RGB閃爍強化 ===== */
-body {
+  background: linear-gradient(-45deg,#ff0000,#00ffff,#ff00ff,#00ff00);
+  background-size:400% 400%;
   animation: rgbMove 4s linear infinite, flash 2s infinite;
 }
 
-@keyframes flash {
-  0%,100% { filter: brightness(1); }
-  50% { filter: brightness(1.5); }
+@keyframes rgbMove{
+  0%{background-position:0% 50%;}
+  100%{background-position:100% 50%;}
 }
 
-/* ===== 整頁震動 ===== */
-@keyframes shake {
-  0%{transform:translate(0)}
-  25%{transform:translate(2px,-2px)}
-  50%{transform:translate(-2px,2px)}
-  75%{transform:translate(2px,2px)}
-  100%{transform:translate(0)}
+@keyframes flash{
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.5);}
 }
 
-/* ===== 滑鼠拖尾 ===== */
-.trail {
+/* 拖尾 */
+.trail{
   position:fixed;
   width:6px;
   height:6px;
@@ -38,12 +37,11 @@ body {
   pointer-events:none;
   animation:fade 0.5s linear forwards;
 }
-
-@keyframes fade {
-  to { opacity:0; transform:scale(3);}
+@keyframes fade{
+  to{opacity:0; transform:scale(3);}
 }
 
-/* canvas背景 */
+/* canvas */
 canvas{
   position:fixed;
   top:0;
@@ -51,12 +49,12 @@ canvas{
   z-index:-2;
 }
 
-/* 黑霧讓字清楚 */
+/* 遮罩 */
 .overlay{
   position:fixed;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.3);
+  background:rgba(0,0,0,0.35);
   z-index:-1;
 }
 
@@ -81,7 +79,6 @@ button{
   color:black;
   cursor:pointer;
 }
-
 button:hover{
   transform:scale(1.2);
 }
@@ -99,7 +96,7 @@ button:hover{
 
 <div class="container">
 <h1>朝陽最帥若偉教授的作業系統課程加分題#2</h1>
-
+<p id="device" style="text-align:center; color:#60a5fa;"></p>
 <div style="text-align:center;">
 <button onclick="show('intro')">個人簡介</button>
 <button onclick="show('skill')">興趣專長</button>
@@ -118,51 +115,116 @@ button:hover{
 <p>技能：麻麻 ∫₀^∞ (10e^{-x}+xe^{-x}) dx 摳</p>
 </div>
 </div>
+// ===== 裝置判斷 =====
+let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+// 顯示裝置
+let deviceText = document.getElementById("device");
+if(isMobile){
+  deviceText.innerText = "📱 手機模式（已降特效）";
+}else{
+  deviceText.innerText = "💻 電腦模式（全特效）";
+}
 <script>
-// 切換
+// ===== 卡片切換 =====
 function show(id){
   let c=document.getElementsByClassName("card");
   for(let i=0;i<c.length;i++) c[i].classList.remove("active");
   document.getElementById(id).classList.add("active");
 }
 
-// ===== canvas背景 =====
+// ===== canvas =====
 let canvas=document.getElementById("bg");
 let ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
 
-// 星空
-let stars=[];
-for(let i=0;i<150;i++){
-  stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,z:Math.random()*canvas.width});
-}
+// ===== 效能模式 =====
+let MODE="HIGH";
+let lowSpec=navigator.hardwareConcurrency<=4;
 
-// 矩陣雨
+let last=performance.now(),frames=0,fps=60;
+function fpsCheck(){
+  let now=performance.now();
+  frames++;
+  if(now-last>=1000){
+    fps=frames;
+    frames=0;
+    last=now;
+    MODE=(fps<30||lowSpec||isMobile)?"LOW":"HIGH";
+  }
+  requestAnimationFrame(fpsCheck);
+}
+fpsCheck();
+
+// ===== 星空 =====
+let stars=[];
+function initStars(n){
+  stars=[];
+  for(let i=0;i<n;i++){
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,z:Math.random()*canvas.width});
+  }
+}
+initStars(120);
+
+// ===== 矩陣雨 =====
 let letters="01";
 let matrix=[];
-for(let i=0;i<canvas.width/20;i++){
-  matrix[i]=1;
+function initMatrix(step){
+  matrix=[];
+  for(let i=0;i<canvas.width/step;i++){
+    matrix[i]=1;
+  }
 }
+initMatrix(20);
 
-// 滑鼠
+// ===== 滑鼠 =====
 let mouse={x:0,y:0};
-document.onmousemove=e=>{
+
+document.addEventListener("mousemove",e=>{
   mouse.x=e.clientX;
   mouse.y=e.clientY;
-};
 
-// 點擊爆炸
-document.onclick=e=>{
-  for(let i=0;i<20;i++){
-    ctx.fillStyle="cyan";
-    ctx.fillRect(e.clientX+Math.random()*20,e.clientY+Math.random()*20,3,3);
+  // RGB跟滑鼠
+  document.body.style.backgroundPosition =
+    (e.clientX/window.innerWidth*100)+"% "+
+    (e.clientY/window.innerHeight*100)+"%";
+
+  // 拖尾（低效能減少）
+  if(MODE==="HIGH" || Math.random()>0.7){
+    let t=document.createElement("div");
+    t.className="trail";
+    t.style.left=e.clientX+"px";
+    t.style.top=e.clientY+"px";
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(),500);
   }
-};
+});
 
-// 閃電
-function lightning(){
+// ===== 點擊爆炸 =====
+document.addEventListener("click",e=>{
+  let count=(MODE==="HIGH")?30:10;
+
+  for(let i=0;i<count;i++){
+    let d=document.createElement("div");
+    d.style.position="fixed";
+    d.style.left=e.clientX+"px";
+    d.style.top=e.clientY+"px";
+    d.style.width="5px";
+    d.style.height="5px";
+    d.style.background="yellow";
+    d.style.borderRadius="50%";
+    d.style.transform=`translate(${Math.random()*100-50}px,${Math.random()*100-50}px)`;
+    d.style.transition="0.5s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),500);
+  }
+});
+
+// ===== 閃電 =====
+setInterval(()=>{
+  if(MODE==="LOW" && Math.random()>0.3) return;
+
   ctx.strokeStyle="white";
   ctx.beginPath();
   let x=Math.random()*canvas.width;
@@ -172,12 +234,27 @@ function lightning(){
     ctx.lineTo(x,i*50);
   }
   ctx.stroke();
-}
-setInterval(lightning,3000);
+},3000);
 
-// 主動畫
+// ===== RGB亂色 =====
+setInterval(()=>{
+  if(MODE==="HIGH"){
+    document.body.style.filter="hue-rotate("+Math.random()*360+"deg)";
+  }
+},500);
+
+// ===== 主動畫 =====
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // 動態調整數量
+  if(MODE==="LOW"){
+    if(stars.length>60) initStars(60);
+    if(matrix.length>canvas.width/40) initMatrix(40);
+  }else{
+    if(stars.length<120) initStars(120);
+    if(matrix.length<canvas.width/20) initMatrix(20);
+  }
 
   // 星空
   for(let i of stars){
@@ -199,7 +276,7 @@ function draw(){
     matrix[i]++;
   }
 
-  // 滑鼠光暈
+  // 光暈
   let g=ctx.createRadialGradient(mouse.x,mouse.y,10,mouse.x,mouse.y,100);
   g.addColorStop(0,"rgba(0,255,255,0.5)");
   g.addColorStop(1,"transparent");
@@ -209,62 +286,6 @@ function draw(){
   requestAnimationFrame(draw);
 }
 draw();
-  // ===== 滑鼠拖尾（超扯）=====
-document.addEventListener("mousemove", e=>{
-  let t=document.createElement("div");
-  t.className="trail";
-  t.style.left=e.clientX+"px";
-  t.style.top=e.clientY+"px";
-  document.body.appendChild(t);
-  setTimeout(()=>t.remove(),500);
-});
-
-// ===== 點擊爆炸升級 =====
-document.onclick=e=>{
-  for(let i=0;i<40;i++){
-    let d=document.createElement("div");
-    d.style.position="fixed";
-    d.style.left=e.clientX+"px";
-    d.style.top=e.clientY+"px";
-    d.style.width="5px";
-    d.style.height="5px";
-    d.style.background="yellow";
-    d.style.borderRadius="50%";
-    d.style.transform=`translate(${Math.random()*100-50}px,${Math.random()*100-50}px)`;
-    d.style.transition="0.5s";
-    document.body.appendChild(d);
-    setTimeout(()=>d.remove(),500);
-  }
-};
-
-// ===== 閃電升級（整畫面閃）=====
-function bigFlash(){
-  let f=document.createElement("div");
-  f.style.position="fixed";
-  f.style.width="100%";
-  f.style.height="100%";
-  f.style.background="white";
-  f.style.opacity="0.2";
-  f.style.top=0;
-  f.style.left=0;
-  document.body.appendChild(f);
-  setTimeout(()=>f.remove(),100);
-}
-setInterval(bigFlash,2000);
-
-// ===== RGB跟滑鼠互動 =====
-document.onmousemove = e=>{
-  document.body.style.backgroundPosition =
-    (e.clientX / window.innerWidth * 100) + "% " +
-    (e.clientY / window.innerHeight * 100) + "%";
-};
-
-// ===== 畫面隨機震動 =====
-setInterval(()=>{
-  document.body.style.animation += ", shake 0.2s";
-  setTimeout(()=>document.body.style.animation =
-    "rgbMove 4s linear infinite, flash 2s infinite",200);
-},3000);
 </script>
 
 </body>
