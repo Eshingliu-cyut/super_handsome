@@ -97,6 +97,7 @@ button:hover{
 <div class="container">
 <h1>朝陽最帥若偉教授的作業系統課程加分題#2</h1>
 <p id="device" style="text-align:center; color:#60a5fa;"></p>
+
 <div style="text-align:center;">
 <button onclick="show('intro')">個人簡介</button>
 <button onclick="show('skill')">興趣專長</button>
@@ -115,31 +116,40 @@ button:hover{
 <p>技能：麻麻 ∫₀^∞ (10e^{-x}+xe^{-x}) dx 摳</p>
 </div>
 </div>
-// ===== 裝置判斷 =====
-let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-// 顯示裝置
-let deviceText = document.getElementById("device");
-if(isMobile){
-  deviceText.innerText = "📱 手機模式（已降特效）";
-}else{
-  deviceText.innerText = "💻 電腦模式（全特效）";
-}
 <script>
-// ===== 卡片切換 =====
-function show(id){
+
+// ===== 裝置判斷（修正完成）=====
+window.onload = function(){
+  let isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  let deviceText = document.getElementById("device");
+
+  if(isMobile){
+    deviceText.innerText = "📱 手機模式（已降特效）";
+  }else{
+    deviceText.innerText = "💻 電腦模式（全特效）";
+  }
+
+  startSystem(isMobile);
+};
+
+// ===== 主系統 =====
+function startSystem(isMobile){
+
+// 卡片切換
+window.show = function(id){
   let c=document.getElementsByClassName("card");
   for(let i=0;i<c.length;i++) c[i].classList.remove("active");
   document.getElementById(id).classList.add("active");
-}
+};
 
-// ===== canvas =====
+// canvas
 let canvas=document.getElementById("bg");
 let ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
 
-// ===== 效能模式 =====
+// 效能模式
 let MODE="HIGH";
 let lowSpec=navigator.hardwareConcurrency<=4;
 
@@ -157,7 +167,7 @@ function fpsCheck(){
 }
 fpsCheck();
 
-// ===== 星空 =====
+// 星空
 let stars=[];
 function initStars(n){
   stars=[];
@@ -167,7 +177,7 @@ function initStars(n){
 }
 initStars(120);
 
-// ===== 矩陣雨 =====
+// 矩陣雨
 let letters="01";
 let matrix=[];
 function initMatrix(step){
@@ -178,19 +188,17 @@ function initMatrix(step){
 }
 initMatrix(20);
 
-// ===== 滑鼠 =====
+// 滑鼠
 let mouse={x:0,y:0};
 
 document.addEventListener("mousemove",e=>{
   mouse.x=e.clientX;
   mouse.y=e.clientY;
 
-  // RGB跟滑鼠
   document.body.style.backgroundPosition =
     (e.clientX/window.innerWidth*100)+"% "+
     (e.clientY/window.innerHeight*100)+"%";
 
-  // 拖尾（低效能減少）
   if(MODE==="HIGH" || Math.random()>0.7){
     let t=document.createElement("div");
     t.className="trail";
@@ -201,10 +209,9 @@ document.addEventListener("mousemove",e=>{
   }
 });
 
-// ===== 點擊爆炸 =====
+// 點擊爆炸
 document.addEventListener("click",e=>{
   let count=(MODE==="HIGH")?30:10;
-
   for(let i=0;i<count;i++){
     let d=document.createElement("div");
     d.style.position="fixed";
@@ -221,7 +228,7 @@ document.addEventListener("click",e=>{
   }
 });
 
-// ===== 閃電 =====
+// 閃電
 setInterval(()=>{
   if(MODE==="LOW" && Math.random()>0.3) return;
 
@@ -236,18 +243,17 @@ setInterval(()=>{
   ctx.stroke();
 },3000);
 
-// ===== RGB亂色 =====
+// RGB亂色
 setInterval(()=>{
   if(MODE==="HIGH"){
     document.body.style.filter="hue-rotate("+Math.random()*360+"deg)";
   }
 },500);
 
-// ===== 主動畫 =====
+// 主動畫
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // 動態調整數量
   if(MODE==="LOW"){
     if(stars.length>60) initStars(60);
     if(matrix.length>canvas.width/40) initMatrix(40);
@@ -256,7 +262,6 @@ function draw(){
     if(matrix.length<canvas.width/20) initMatrix(20);
   }
 
-  // 星空
   for(let i of stars){
     i.z-=2;
     if(i.z<=0) i.z=canvas.width;
@@ -267,7 +272,6 @@ function draw(){
     ctx.fillRect(x,y,2,2);
   }
 
-  // 矩陣雨
   ctx.fillStyle="rgba(0,255,0,0.5)";
   for(let i=0;i<matrix.length;i++){
     let text=letters[Math.floor(Math.random()*letters.length)];
@@ -276,7 +280,6 @@ function draw(){
     matrix[i]++;
   }
 
-  // 光暈
   let g=ctx.createRadialGradient(mouse.x,mouse.y,10,mouse.x,mouse.y,100);
   g.addColorStop(0,"rgba(0,255,255,0.5)");
   g.addColorStop(1,"transparent");
@@ -286,6 +289,8 @@ function draw(){
   requestAnimationFrame(draw);
 }
 draw();
+
+}
 </script>
 
 </body>
