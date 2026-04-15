@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>個人網站</title>
+
+<style>
+/* ===== 背景動畫 ===== */
+body {
+  margin: 0;
+  font-family: Arial, "Microsoft JhengHei";
+  color: white;
+  background: linear-gradient(-45deg, #1e3a8a, #9333ea, #0ea5e9, #10b981);
+  background-size: 400% 400%;
+  animation: bgMove 10s infinite alternate;
+}
+
+@keyframes bgMove {
+  0% { background-position: left; }
+  100% { background-position: right; }
+}
+
+/* ===== 主框 ===== */
+.container {
+  width: 90%;
+  max-width: 900px;
+  margin: 50px auto;
+  background: rgba(0,0,0,0.5);
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
+}
+
+/* ===== 標題動畫 ===== */
+h1 {
+  text-align: center;
+  font-size: 36px;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px #fff; }
+  to { text-shadow: 0 0 25px #00f0ff; }
+}
+
+/* ===== 裝置提示 ===== */
+.desktop-only { display: block; color: #60a5fa; text-align:center;}
+.mobile-only { display: none; color: #34d399; text-align:center;}
+
+/* ===== 按鈕 ===== */
+.btn-group {
+  text-align: center;
+  margin: 25px 0;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 8px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(45deg,#3b82f6,#9333ea);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #fff;
+}
+
+/* ===== 內容卡片 ===== */
+.card {
+  display: none;
+  padding: 20px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.1);
+  animation: fade 0.5s;
+}
+
+.card.active {
+  display: block;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity: 1; transform: translateY(0);}
+}
+
+/* ===== 手機版 ===== */
+@media screen and (max-width: 768px) {
+  body {
+    background: linear-gradient(45deg,#16a34a,#22c55e);
+  }
+
+  .desktop-only { display: none; }
+  .mobile-only { display: block; }
+
+  h1 { font-size: 26px; }
+
+  button {
+    width: 100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>我的個人網站</h1>
+
+  <p class="desktop-only">💻 目前為桌機版（>768px）</p>
+  <p class="mobile-only">📱 目前為手機版（≤768px）</p>
+
+  <div class="btn-group">
+    <button onclick="show('intro')">個人簡介</button>
+    <button onclick="show('skill')">興趣專長</button>
+  </div>
+
+  <div id="intro" class="card active">
+    <h2>個人簡介</h2>
+    <p>姓名：劉以心</p>
+    <p>學校：朝陽科技大學 資工系2A學生</p>
+    <p>我喜歡睡覺</p>
+  </div>
+
+  <div id="skill" class="card">
+    <h2>興趣專長</h2>
+    <p>耍廢、上2690 作業系統帥氣若偉教授的課程</p>
+    <p>技能：媽媽∫₀^∞ (10e^{-x} + x e^{-x}) dx摳</p>
+  </div>
+</div>
+
+<script>
+function show(id){
+  let cards = document.getElementsByClassName("card");
+  for(let i=0;i<cards.length;i++){
+    cards[i].classList.remove("active");
+  }
+  document.getElementById(id).classList.add("active");
+}
+</script>
+
+</body>
+</html>
