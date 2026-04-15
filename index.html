@@ -3,24 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>朝陽最帥若偉教授的作業系統課程</title>
+<title>加分題#2</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial,"Microsoft JhengHei";
-  color:white;
-  overflow:hidden;
 
-  /* RGB背景 */
-  background: linear-gradient(-45deg,#ff0000,#00ffff,#ff00ff,#00ff00);
-  background-size:400% 400%;
-  animation:rgbMove 6s linear infinite;
+
+  
+/* ===== RGB閃爍強化 ===== */
+body {
+  animation: rgbMove 4s linear infinite, flash 2s infinite;
 }
 
-@keyframes rgbMove{
-  0%{background-position:0% 50%;}
-  100%{background-position:100% 50%;}
+@keyframes flash {
+  0%,100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+
+/* ===== 整頁震動 ===== */
+@keyframes shake {
+  0%{transform:translate(0)}
+  25%{transform:translate(2px,-2px)}
+  50%{transform:translate(-2px,2px)}
+  75%{transform:translate(2px,2px)}
+  100%{transform:translate(0)}
+}
+
+/* ===== 滑鼠拖尾 ===== */
+.trail {
+  position:fixed;
+  width:6px;
+  height:6px;
+  background:cyan;
+  border-radius:50%;
+  pointer-events:none;
+  animation:fade 0.5s linear forwards;
+}
+
+@keyframes fade {
+  to { opacity:0; transform:scale(3);}
 }
 
 /* canvas背景 */
@@ -78,7 +98,7 @@ button:hover{
 <div class="overlay"></div>
 
 <div class="container">
-<h1>加分題#2</h1>
+<h1>朝陽最帥若偉教授的作業系統課程加分題#2</h1>
 
 <div style="text-align:center;">
 <button onclick="show('intro')">個人簡介</button>
@@ -189,6 +209,62 @@ function draw(){
   requestAnimationFrame(draw);
 }
 draw();
+  // ===== 滑鼠拖尾（超扯）=====
+document.addEventListener("mousemove", e=>{
+  let t=document.createElement("div");
+  t.className="trail";
+  t.style.left=e.clientX+"px";
+  t.style.top=e.clientY+"px";
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),500);
+});
+
+// ===== 點擊爆炸升級 =====
+document.onclick=e=>{
+  for(let i=0;i<40;i++){
+    let d=document.createElement("div");
+    d.style.position="fixed";
+    d.style.left=e.clientX+"px";
+    d.style.top=e.clientY+"px";
+    d.style.width="5px";
+    d.style.height="5px";
+    d.style.background="yellow";
+    d.style.borderRadius="50%";
+    d.style.transform=`translate(${Math.random()*100-50}px,${Math.random()*100-50}px)`;
+    d.style.transition="0.5s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),500);
+  }
+};
+
+// ===== 閃電升級（整畫面閃）=====
+function bigFlash(){
+  let f=document.createElement("div");
+  f.style.position="fixed";
+  f.style.width="100%";
+  f.style.height="100%";
+  f.style.background="white";
+  f.style.opacity="0.2";
+  f.style.top=0;
+  f.style.left=0;
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),100);
+}
+setInterval(bigFlash,2000);
+
+// ===== RGB跟滑鼠互動 =====
+document.onmousemove = e=>{
+  document.body.style.backgroundPosition =
+    (e.clientX / window.innerWidth * 100) + "% " +
+    (e.clientY / window.innerHeight * 100) + "%";
+};
+
+// ===== 畫面隨機震動 =====
+setInterval(()=>{
+  document.body.style.animation += ", shake 0.2s";
+  setTimeout(()=>document.body.style.animation =
+    "rgbMove 4s linear infinite, flash 2s infinite",200);
+},3000);
 </script>
 
 </body>
